@@ -1,1 +1,5 @@
-void test_openssl_sm3();
+#pragma once
+#include <sys/types.h>
+/* int testOpensslSm3(const void* msg, size_t len, const void* dgst); */
+int testOpensslSm3();
+void testTrivialSm3();

@@ -1,43 +1,89 @@
-#include "sm3.h"
 #include <openssl/evp.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 1024 //B
-#define FILE1_SIZE 1024 //1KiB
-#define FILE2_SIZE 1024 * 1024 //1MiB
-#define FILE3_SIZE 1024 * 1024 * 128 //128MiB
-void test_openssl_sm3()
+int opensslSm3(uint8_t* dgst, const char* src)
 {
-    OpenSSL_add_all_algorithms();
-    unsigned char sm3_value[EVP_MAX_MD_SIZE]; //保存输出的摘要值的数组
-    /* printf("%d", EVP_MAX_MD_SIZE); //EVP_MAX_MD_SIZE = 64 */
-    unsigned int sm3_len, i;
-    EVP_MD_CTX* sm3ctx; //EVP消息摘要结构体
-    sm3ctx = EVP_MD_CTX_new();
-    char buf[BUFFER_SIZE];
+
+    int flag = 0;
+    uint32_t sm3_len;
+    EVP_MD_CTX* sm3ctx = EVP_MD_CTX_new(); //新建结构体
+    char buffer[BUFFER_SIZE]; //存储明文的buffer
 
     clock_t start, end;
 
     EVP_MD_CTX_init(sm3ctx); //初始化摘要结构体
-    EVP_DigestInit_ex(sm3ctx, EVP_sm3(), NULL); //设置摘要算法和密码算法引擎，这里密码算法使用sm3，算法引擎使用OpenSSL默认引擎即软算法
+    EVP_DigestInit_ex(sm3ctx, EVP_sm3(), NULL); //设置摘要算法和密码算法引擎
 
-    FILE* f1 = fopen("/home/ubuntu/ClionProjects/sm3/resource/file3", "r");
+    uint64_t str_length = strlen(src);
     start = clock();
+    int i;
+    for (i = 0; i < str_length / BUFFER_SIZE; i++) {
+        memcpy(buffer, src + i * BUFFER_SIZE, BUFFER_SIZE);
+        EVP_DigestUpdate(sm3ctx, buffer, BUFFER_SIZE); //逐次迭代计算文件中所有数值的摘要
+    }
+    EVP_DigestUpdate(sm3ctx, src + i * BUFFER_SIZE, str_length - i * BUFFER_SIZE);
+    end = clock();
+
+    printf("\nTotal time %f\n", (double)(end - start) / CLOCKS_PER_SEC);
+    EVP_DigestFinal_ex(sm3ctx, dgst, &sm3_len); //摘要结束，输出摘要值
+    EVP_MD_CTX_reset(sm3ctx); //释放内存
+    return 0;
+    return 0;
+}
+//从文件中读取数据，并进行hash
+int opensslSm3FromFile(uint8_t* dgst, const char* file_name)
+{
+    int flag = 0;
+    uint32_t sm3_len;
+    EVP_MD_CTX* sm3ctx = EVP_MD_CTX_new(); //新建结构体
+    char buffer[BUFFER_SIZE]; //存储明文的buffer
+
+    clock_t start, end;
+
+    EVP_MD_CTX_init(sm3ctx); //初始化摘要结构体
+    EVP_DigestInit_ex(sm3ctx, EVP_sm3(), NULL); //设置摘要算法和密码算法引擎
+
+    FILE* f1 = fopen(file_name, "r");
     if (f1 == NULL)
         exit(1);
-    for (int i = 0; i < FILE3_SIZE / BUFFER_SIZE; i++) {
-        fread(buf, sizeof(char), BUFFER_SIZE, f1);
-        EVP_DigestUpdate(sm3ctx, buf, BUFFER_SIZE); //逐次迭代计算文件中所有数值的摘要
+    uint64_t file_length = 0;
+    //计算文件大小
+    while (fgetc(f1) != EOF) {
+        file_length++;
+    }
+    rewind(f1);
+    start = clock();
+    for (int i = 0; i < file_length / BUFFER_SIZE; i++) {
+        int t = fread(buffer, sizeof(char), BUFFER_SIZE, f1);
+        EVP_DigestUpdate(sm3ctx, buffer, BUFFER_SIZE); //逐次迭代计算文件中所有数值的摘要
     }
     end = clock();
 
-    EVP_DigestFinal_ex(sm3ctx, sm3_value, &sm3_len); //摘要结束，输出摘要值
+    printf("\nTotal time %f\n", (double)(end - start) / CLOCKS_PER_SEC);
+    EVP_DigestFinal_ex(sm3ctx, dgst, &sm3_len); //摘要结束，输出摘要值
     EVP_MD_CTX_reset(sm3ctx); //释放内存
-
-    printf("原始数据%s的摘要值为:\n", buf);
-    for (i = 0; i < sm3_len; i++) {
-        printf("0x%02x ", sm3_value[i]);
+    return 0;
+}
+/* int testOpensslSm3(const void* msg, size_t len, const void* dgst) */
+int testOpensslSm3()
+{
+    uint8_t dgst1[EVP_MAX_MD_SIZE]; //保存摘要的数组
+    char file_name[] = "/home/ubuntu/ClionProjects/sm3/resource/file1";
+    opensslSm3FromFile(dgst1, file_name);
+    for (int i = 0; i < EVP_MAX_MD_SIZE; i++) {
+        printf("%x", dgst1[i]);
     }
-    printf("\nTotal time%f", (double)(end - start) / CLOCKS_PER_SEC);
+
+    uint8_t dgst2[EVP_MAX_MD_SIZE]; //保存摘要的数组
+    char src_data[] = "sm3";
+    opensslSm3(dgst2, src_data);
+    for (int i = 0; i < EVP_MAX_MD_SIZE; i++) {
+        printf("%x", dgst2[i]);
+    }
+    /* return memcmp(buf, dgst, 32); */
+    return 0;
 }
