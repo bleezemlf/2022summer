@@ -4,7 +4,7 @@
 #include <string.h>
 int main()
 {
-    testOpensslSm3();
-    /* testTrivialSm3(); */
+    /* testOpensslSm3(); */
+    testSimpleSm3();
     return 0;
 }

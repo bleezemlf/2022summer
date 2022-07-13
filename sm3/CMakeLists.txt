@@ -4,7 +4,7 @@ project(sm3)
 set(CMAKE_C_STANDARD 11)
 
 find_package(OpenSSL REQUIRED)
-add_executable(sm3 sm3.h main.c openssl_sm3.c)
+add_executable(sm3 sm3.h main.c openssl_sm3.c simple_sm3.c)
 
 set(DEP_LIBS
     OpenSSL::Crypto OpenSSL::SSL  # modern

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 1024 //B
+/* #define BUFFER_SIZE 2097512 //B */
 int opensslSm3(uint8_t* dgst, const char* src)
 {
 
@@ -71,18 +72,18 @@ int opensslSm3FromFile(uint8_t* dgst, const char* file_name)
 /* int testOpensslSm3(const void* msg, size_t len, const void* dgst) */
 int testOpensslSm3()
 {
-    uint8_t dgst1[EVP_MAX_MD_SIZE]; //保存摘要的数组
-    char file_name[] = "/home/ubuntu/ClionProjects/sm3/resource/file1";
-    opensslSm3FromFile(dgst1, file_name);
-    for (int i = 0; i < EVP_MAX_MD_SIZE; i++) {
-        printf("%x", dgst1[i]);
-    }
-
     uint8_t dgst2[EVP_MAX_MD_SIZE]; //保存摘要的数组
     char src_data[] = "sm3";
     opensslSm3(dgst2, src_data);
     for (int i = 0; i < EVP_MAX_MD_SIZE; i++) {
         printf("%x", dgst2[i]);
+    }
+
+    uint8_t dgst1[EVP_MAX_MD_SIZE]; //保存摘要的数组
+    char file_name[] = "/home/ubuntu/ClionProjects/sm3/resource/file3";
+    opensslSm3FromFile(dgst1, file_name);
+    for (int i = 0; i < EVP_MAX_MD_SIZE; i++) {
+        printf("%x", dgst1[i]);
     }
     /* return memcmp(buf, dgst, 32); */
     return 0;
