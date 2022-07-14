@@ -12,7 +12,6 @@ int opensslSm3(uint8_t* dgst, const char* src)
     int flag = 0;
     uint32_t sm3_len;
     EVP_MD_CTX* sm3ctx = EVP_MD_CTX_new(); //新建结构体
-    char buffer[BUFFER_SIZE]; //存储明文的buffer
 
     clock_t start, end;
 
@@ -21,18 +20,11 @@ int opensslSm3(uint8_t* dgst, const char* src)
 
     uint64_t str_length = strlen(src);
     start = clock();
-    int i;
-    for (i = 0; i < str_length / BUFFER_SIZE; i++) {
-        memcpy(buffer, src + i * BUFFER_SIZE, BUFFER_SIZE);
-        EVP_DigestUpdate(sm3ctx, buffer, BUFFER_SIZE); //逐次迭代计算文件中所有数值的摘要
-    }
-    EVP_DigestUpdate(sm3ctx, src + i * BUFFER_SIZE, str_length - i * BUFFER_SIZE);
-    end = clock();
-
-    printf("\nTotal time %f\n", (double)(end - start) / CLOCKS_PER_SEC);
+    EVP_DigestUpdate(sm3ctx, src, str_length);
     EVP_DigestFinal_ex(sm3ctx, dgst, &sm3_len); //摘要结束，输出摘要值
+    end = clock();
+    printf("\nTotal time %f\n", (double)(end - start) / CLOCKS_PER_SEC);
     EVP_MD_CTX_reset(sm3ctx); //释放内存
-    return 0;
     return 0;
 }
 //从文件中读取数据，并进行hash
@@ -58,10 +50,13 @@ int opensslSm3FromFile(uint8_t* dgst, const char* file_name)
     }
     rewind(f1);
     start = clock();
-    for (int i = 0; i < file_length / BUFFER_SIZE; i++) {
+    int i;
+    for (i = 0; i < file_length / BUFFER_SIZE; i++) {
         int t = fread(buffer, sizeof(char), BUFFER_SIZE, f1);
         EVP_DigestUpdate(sm3ctx, buffer, BUFFER_SIZE); //逐次迭代计算文件中所有数值的摘要
     }
+    fread(buffer, sizeof(char), file_length - i * BUFFER_SIZE, f1);
+    EVP_DigestUpdate(sm3ctx, buffer, file_length - i * BUFFER_SIZE); //逐次迭代计算文件中所有数值的摘要
     end = clock();
 
     printf("\nTotal time %f\n", (double)(end - start) / CLOCKS_PER_SEC);
@@ -75,15 +70,15 @@ int testOpensslSm3()
     uint8_t dgst2[EVP_MAX_MD_SIZE]; //保存摘要的数组
     char src_data[] = "sm3";
     opensslSm3(dgst2, src_data);
-    for (int i = 0; i < EVP_MAX_MD_SIZE; i++) {
-        printf("%x", dgst2[i]);
+    for (int i = 0; i < 32; i++) {
+        printf("%02x", dgst2[i]);
     }
 
     uint8_t dgst1[EVP_MAX_MD_SIZE]; //保存摘要的数组
     char file_name[] = "/home/ubuntu/ClionProjects/sm3/resource/file3";
     opensslSm3FromFile(dgst1, file_name);
-    for (int i = 0; i < EVP_MAX_MD_SIZE; i++) {
-        printf("%x", dgst1[i]);
+    for (int i = 0; i < 32; i++) {
+        printf("%02x", dgst1[i]);
     }
     /* return memcmp(buf, dgst, 32); */
     return 0;
