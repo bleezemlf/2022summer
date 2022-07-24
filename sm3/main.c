@@ -4,9 +4,10 @@
 #include <string.h>
 int main()
 {
-    printf("testOpensslSm3\n");
-    testOpensslSm3();
-    printf("\n\ntestOpensslSm3\n");
-    testSimpleSm3();
+    /* printf("testOpensslSm3\n"); */
+    /* testOpensslSm3(); */
+    /* printf("\n\ntestOpensslSm3\n"); */
+    /* testSimpleSm3(); */
+    testSIMD();
     return 0;
 }
