@@ -1,4 +1,5 @@
 #include "sm3.h"
+#include <immintrin.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -23,7 +24,7 @@
     | (0x0000ff00 & x >> 8)                   \
     | (0x000000ff & x >> 24)
 
-uint32_t IV[] = { 0x7380166f, 0x4914b2b9, 0x172442d7, 0xda8a0600, 0xa96f30bc, 0x163138aa, 0xe38dee4d, 0xb0fb0e4e };
+static uint32_t IV[] = { 0x7380166f, 0x4914b2b9, 0x172442d7, 0xda8a0600, 0xa96f30bc, 0x163138aa, 0xe38dee4d, 0xb0fb0e4e };
 
 typedef struct sm3ctx {
     uint32_t v[SM3_VECTOR_BLOCK_BYTESIZE / sizeof(uint32_t)];
@@ -32,14 +33,14 @@ typedef struct sm3ctx {
     size_t nblocks;
 } Sm3Ctx;
 
-inline void debugPrint256bit(uint32_t v[8])
+static inline void debugPrint256bit(uint32_t v[8])
 {
     for (int i = 0; i < 8; i++) {
         printf("%08x ", v[i]);
     }
     printf("\n\n");
 }
-inline void debugPrint(uint32_t* msg, size_t len)
+static inline void debugPrint(uint32_t* msg, size_t len)
 {
     for (int i = 0; i < len; i++) {
         if (i % 8 == 0 && i != 0)
@@ -49,36 +50,36 @@ inline void debugPrint(uint32_t* msg, size_t len)
     printf("\n\n");
 }
 
-inline uint32_t rol(uint32_t data, uint32_t len)
+static inline uint32_t rol(uint32_t data, uint32_t len)
 {
     return data << len | data >> (sizeof(data) * 8 - len);
 }
 
-inline uint32_t P0(uint32_t X)
+static inline uint32_t P0(uint32_t X)
 {
     return X ^ rol(X, 9) ^ rol(X, 17);
 }
-inline uint32_t P1(uint32_t X)
+static inline uint32_t P1(uint32_t X)
 {
     return X ^ rol(X, 15) ^ rol(X, 23);
 }
-inline uint32_t FF0(uint32_t X, uint32_t Y, uint32_t Z)
+static inline uint32_t FF0(uint32_t X, uint32_t Y, uint32_t Z)
 {
     return X ^ Y ^ Z;
 }
-inline uint32_t FF1(uint32_t X, uint32_t Y, uint32_t Z)
+static inline uint32_t FF1(uint32_t X, uint32_t Y, uint32_t Z)
 {
     return (X & Y) | (X & Z) | (Y & Z);
 }
-inline uint32_t GG0(uint32_t X, uint32_t Y, uint32_t Z)
+static inline uint32_t GG0(uint32_t X, uint32_t Y, uint32_t Z)
 {
     return X ^ Y ^ Z;
 }
-inline uint32_t GG1(uint32_t X, uint32_t Y, uint32_t Z)
+static inline uint32_t GG1(uint32_t X, uint32_t Y, uint32_t Z)
 {
     return (X & Y) | (~X & Z);
 }
-void CF(uint32_t v[SM3_VECTOR_BLOCK_BYTESIZE / sizeof(uint32_t)], const uint8_t msg[SM3_MSG_BLOCK_BYTESIZE])
+static void CF(uint32_t v[SM3_VECTOR_BLOCK_BYTESIZE / sizeof(uint32_t)], const uint8_t msg[SM3_MSG_BLOCK_BYTESIZE])
 {
     uint32_t A = v[0];
     uint32_t B = v[1];
@@ -138,7 +139,7 @@ void CF(uint32_t v[SM3_VECTOR_BLOCK_BYTESIZE / sizeof(uint32_t)], const uint8_t 
     v[7] ^= H;
 }
 
-void sm3Init(Sm3Ctx* ctx)
+static void sm3Init(Sm3Ctx* ctx)
 {
     memcpy(ctx->v, IV, 32);
     ctx->num = 0;
@@ -146,7 +147,7 @@ void sm3Init(Sm3Ctx* ctx)
     memset(ctx->msg, 0, 64);
 }
 
-void sm3Update(Sm3Ctx* ctx, const uint8_t* msg, size_t msg_len)
+static void sm3Update(Sm3Ctx* ctx, const uint8_t* msg, size_t msg_len)
 {
     /* for (int i = 0; i < 64; i++) { */
     /*     printf("%02x", ctx->msg[i]); */
@@ -181,7 +182,7 @@ void sm3Update(Sm3Ctx* ctx, const uint8_t* msg, size_t msg_len)
     /* printf("\n"); */
 }
 
-void sm3Final(Sm3Ctx* ctx, uint8_t* v)
+static void sm3Final(Sm3Ctx* ctx, uint8_t* v)
 {
     size_t i;
     uint32_t* t_v = (uint32_t*)(v);
@@ -254,7 +255,7 @@ void testSimpleSm3()
 
     uint8_t dgst2[SM3_VECTOR_BLOCK_BYTESIZE]; //保存摘要的数组
     char file_name[] = "/home/ubuntu/ClionProjects/sm3/resource/file3";
-    simSm3FromFile(dgst1, file_name);
+    simSm3FromFile(dgst2, file_name);
     for (int i = 0; i < 32; i++)
-        printf("%02x", dgst1[i]);
+        printf("%02x", dgst2[i]);
 }

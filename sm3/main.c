@@ -4,10 +4,12 @@
 #include <string.h>
 int main()
 {
-    /* printf("testOpensslSm3\n"); */
-    /* testOpensslSm3(); */
-    /* printf("\n\ntestOpensslSm3\n"); */
-    /* testSimpleSm3(); */
-    testSIMD();
+    printf("testOpensslWSm3\n");
+    testOpensslSm3();
+    printf("\n\ntestSimSm3\n");
+    testSimpleSm3();
+    /* testSIMD(); */
+    printf("\n\ntestOptiSm3\n");
+    testOptiSm3();
     return 0;
 }
