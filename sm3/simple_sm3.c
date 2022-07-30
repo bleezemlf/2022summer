@@ -213,7 +213,7 @@ void simSm3(uint8_t* dgst, const char* src)
     sm3Update(&ctx, src, str_length);
     sm3Final(&ctx, dgst);
     end_time = clock();
-    printf("\nTotal time %f\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+    printf("\nstring is \"%s\" length %d Total time %f\n", src, str_length, (double)(end_time - start_time) / CLOCKS_PER_SEC);
 }
 void simSm3FromFile(uint8_t* dgst, const char* file_name)
 {
@@ -243,7 +243,7 @@ void simSm3FromFile(uint8_t* dgst, const char* file_name)
     sm3Final(&ctx, dgst);
     end = clock();
 
-    printf("\nTotal time %f\n", (double)(end - start) / CLOCKS_PER_SEC);
+    printf("\nfile name is \"%s\" file_length %d Total time %f\n", file_name, file_length, (double)(end - start) / CLOCKS_PER_SEC);
 }
 void testSimpleSm3()
 {

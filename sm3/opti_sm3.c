@@ -233,15 +233,15 @@ static void sm3Final(Sm3Ctx* ctx, uint8_t* v)
 
 void optiSm3(uint8_t* dgst, const char* src)
 {
+    clock_t start_time, end_time;
     Sm3Ctx ctx;
     sm3Init(&ctx);
     size_t str_length = strlen(src);
-    clock_t start_time, end_time;
     start_time = clock();
     sm3Update(&ctx, src, str_length);
     sm3Final(&ctx, dgst);
     end_time = clock();
-    printf("\nTotal time %f\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+    printf("\nstring is \"%s\" length %d Total time %f\n", src, str_length, (double)(end_time - start_time) / CLOCKS_PER_SEC);
 }
 void optiSm3FromFile(uint8_t* dgst, const char* file_name)
 {
@@ -270,7 +270,7 @@ void optiSm3FromFile(uint8_t* dgst, const char* file_name)
     sm3Final(&ctx, dgst);
     end = clock();
 
-    printf("\nTotal time %f\n", (double)(end - start) / CLOCKS_PER_SEC);
+    printf("\nfile name is \"%s\" file_length %d Total time %f\n", file_name, file_length, (double)(end - start) / CLOCKS_PER_SEC);
 }
 void testOptiSm3()
 {

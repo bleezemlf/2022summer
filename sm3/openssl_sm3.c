@@ -5,7 +5,6 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 1024 //B
-/* #define BUFFER_SIZE 2097512 //B */
 int opensslSm3(uint8_t* dgst, const char* src)
 {
 
@@ -23,7 +22,7 @@ int opensslSm3(uint8_t* dgst, const char* src)
     EVP_DigestUpdate(sm3ctx, src, str_length);
     EVP_DigestFinal_ex(sm3ctx, dgst, &sm3_len); //摘要结束，输出摘要值
     end = clock();
-    printf("\nTotal time %f\n", (double)(end - start) / CLOCKS_PER_SEC);
+    printf("\nstring is \"%s\" length %d Total time %f\n", src, str_length, (double)(end - start) / CLOCKS_PER_SEC);
     EVP_MD_CTX_reset(sm3ctx); //释放内存
     return 0;
 }
@@ -59,7 +58,7 @@ int opensslSm3FromFile(uint8_t* dgst, const char* file_name)
     EVP_DigestUpdate(sm3ctx, buffer, file_length - i * BUFFER_SIZE); //逐次迭代计算文件中所有数值的摘要
     end = clock();
 
-    printf("\nTotal time %f\n", (double)(end - start) / CLOCKS_PER_SEC);
+    printf("\nfile name is \"%s\" file_length %d Total time %f\n", file_name, file_length, (double)(end - start) / CLOCKS_PER_SEC);
     EVP_DigestFinal_ex(sm3ctx, dgst, &sm3_len); //摘要结束，输出摘要值
     EVP_MD_CTX_reset(sm3ctx); //释放内存
     return 0;
@@ -80,6 +79,5 @@ int testOpensslSm3()
     for (int i = 0; i < 32; i++) {
         printf("%02x", dgst1[i]);
     }
-    /* return memcmp(buf, dgst, 32); */
     return 0;
 }
