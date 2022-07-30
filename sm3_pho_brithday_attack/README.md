@@ -1,0 +1,1 @@
+文档已合并到sm3_birthday_attack
