@@ -7,7 +7,7 @@
 
 ## 使用说明：
 
-如下图：使用时请修改file_name的值，以指定一个有效的文件路径，然后运行文件夹中的脚本cr.sh即可`./cr.sh`
+如下图：使用时请在`main.c`中修改file_name的值，以指定一个有效的文件路径，然后运行文件夹中的脚本cr.sh即可`./cr.sh`
 
 <img src="README.assets/image-20220731103553292.png" alt="image-20220731103553292" style="zoom: 80%;" />
 
