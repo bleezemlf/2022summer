@@ -1,1 +1,1 @@
-文档已合并到sm3_birthday_attack
+文档已合并到[sm3_birthday_attack](https://github.com/bleezemlf/2022summer/blob/master/sm3_birthday_attack/README.md)
