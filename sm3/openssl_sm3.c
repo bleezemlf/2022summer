@@ -64,17 +64,15 @@ int opensslSm3FromFile(uint8_t* dgst, const char* file_name)
     return 0;
 }
 /* int testOpensslSm3(const void* msg, size_t len, const void* dgst) */
-int testOpensslSm3()
+int testOpensslSm3(char* src_str, char* file_name)
 {
     uint8_t dgst2[EVP_MAX_MD_SIZE]; //保存摘要的数组
-    char src_data[] = "sm3";
-    opensslSm3(dgst2, src_data);
+    opensslSm3(dgst2, src_str);
     for (int i = 0; i < 32; i++) {
         printf("%02x", dgst2[i]);
     }
 
     uint8_t dgst1[EVP_MAX_MD_SIZE]; //保存摘要的数组
-    char file_name[] = "/home/ubuntu/ClionProjects/sm3/resource/file3";
     opensslSm3FromFile(dgst1, file_name);
     for (int i = 0; i < 32; i++) {
         printf("%02x", dgst1[i]);

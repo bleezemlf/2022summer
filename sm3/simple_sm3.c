@@ -245,16 +245,14 @@ void simSm3FromFile(uint8_t* dgst, const char* file_name)
 
     printf("\nfile name is \"%s\" file_length %d Total time %f\n", file_name, file_length, (double)(end - start) / CLOCKS_PER_SEC);
 }
-void testSimpleSm3()
+void testSimpleSm3(char* src_str, char* file_name)
 {
     uint8_t dgst1[SM3_VECTOR_BLOCK_BYTESIZE];
-    const char src_str[] = "sm3";
     simSm3(dgst1, src_str);
     for (int i = 0; i < 32; i++)
         printf("%02x", dgst1[i]);
 
     uint8_t dgst2[SM3_VECTOR_BLOCK_BYTESIZE]; //保存摘要的数组
-    char file_name[] = "/home/ubuntu/ClionProjects/sm3/resource/file3";
     simSm3FromFile(dgst2, file_name);
     for (int i = 0; i < 32; i++)
         printf("%02x", dgst2[i]);
